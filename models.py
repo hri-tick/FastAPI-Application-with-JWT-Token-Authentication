@@ -1,9 +1,11 @@
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float
 from sqlalchemy.orm import relationship
 from schemas import Roles
-from sqlalchemy import Enum
-from database import Base
+from sqlalchemy import Enum , text
+from database import Base,engine
+from geoalchemy2 import Geometry
+
 
 
 class User(Base):
@@ -24,6 +26,15 @@ class POI(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    geometry = Column(String, index=True)
+    geometry = Column(Geometry('POINT'))
+    #geometry = Column(String, index=True)
+    #geometry = Column(Geometry(geometry_type='POINT', srid=4326, spatial_index=True))
+    #latitude = Column(Float)
+    #longitude = Column(Float)
+    
+
     owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="pois")
+    
+    
+#Base.metadata.create_all(bind=engine)

@@ -42,12 +42,44 @@ def get_pois(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_user_poi(db: Session, poi: schemas.POICreate, user_id: int):
-    db_item = models.POI(name = poi.name ,geometry = poi.geometry, owner_id=user_id)
     
-    db.add(db_item)
-    db.commit()
-    db.refresh(db_item)
-    return db_item
+        #wkt_geometry = f"POINT({poi.geometry[0]} {poi.geometry[1]})"
+        #point_geometry = WKTElement(f'POINT({poi.geometry[0]} {poi.geometry[1]})', srid=4326)
+        #point_geometry = f'ST_GeomFromText(\'POINT({poi.geometry[0]} {poi.geometry[1]})\', 4326)'
+        #db_point = Point(geometry=f"POINT(f'POINT({poi.geometry[0]} {poi.geometry[1]})', srid=4326)")
+    
+        db_point=f'POINT({poi.geometry[0]} {poi.geometry[1]})'
+
+        #point_geometry = f"SRID=4326;POINT({poi.longitude} {poi.latitude})"
+        #db_item = models.POI(name = poi.name, geometry=point_geometry,owner_id=user_id)
+        db_item = models.POI(name = poi.name, geometry=db_point,owner_id=user_id)
+        #db_item = models.POI(name = poi.name, geometry=from_shape(wkt.loads(poi.geometry),srid = 4326),owner_id=user_id)
+        #wkt_geometry = f"SRID=4326;POINT({poi.geometry[0]} {poi.geometry[1]})"
+        #poi_geometry = WKTElement(wkt_geometry)
+
+        #db_item = models.POI(name = poi.name ,geometry =WKTElement(wkt_geometry, srid=4326), owner_id=user_id)
+        
+        db.add(db_item)
+        db.commit()
+        db.refresh(db_item)
+   
+  
+   
+        '''
+        wkt_geometry = f"SRID=4326;POINT({poi.geometry[0]} {poi.geometry[1]})"
+  
+        # Create a new POI instance
+        db_poi = models.POI(name=poi.name, owner_id=user_id)
+        
+        # Use the ST_GeomFromText function in the SQL query
+        sql_query = text("INSERT INTO pois (name, geometry, owner_id) VALUES (:name, ST_GeomFromText(:geometry, :srid), :owner_id)")
+        
+        # Execute the query
+        db.execute(sql_query, {"name": poi.name, "geometry": wkt_geometry, "srid": 4326, "owner_id": user_id})
+        
+        # Commit the changes
+        db.commit()'''
+        return db_item
 
 
 def create_access_token(user):
